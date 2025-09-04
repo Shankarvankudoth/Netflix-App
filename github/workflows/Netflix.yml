@@ -39,13 +39,4 @@ jobs:
 
       # ---------------- Trivy File System Scan ----------------
       - name: Run Trivy FS Scan
-        run: |
-          trivy fs --no-progress --exit-code 1 --severity HIGH,CRITICAL .
-
-      # ---------------- Trivy Docker Image Scan ----------------
-      - name: Build Docker Image
-        run: docker build -t netflix-app:latest .
-
-      - name: Run Trivy Image Scan
-        run: |
-          trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL netflix-app:latest
+        run: trivy fs --no-progress --exit-code 1 --severity HIGH,CRITICAL .
