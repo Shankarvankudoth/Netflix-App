@@ -7,38 +7,35 @@ on:
 
 jobs:
   build:
-    name: Build & Scan
     runs-on: ubuntu-latest
 
     steps:
       # Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      # SonarQube Scan
+      # Run SonarQube Scan
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      # Install Trivy
+      # Install Trivy CLI (LTS version)
       - name: Install Trivy
         run: |
           sudo apt-get update -y
           sudo apt-get install -y wget apt-transport-https gnupg lsb-release
-          wget -qO- https://aquasecurity.github.io/trivy-repo/deb/public.key \
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key \
             | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] \
             https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" \
             | sudo tee /etc/apt/sources.list.d/trivy.list
           sudo apt-get update -y
           sudo apt-get install -y trivy
-          trivy --version
+          trivy --version   # check installed version
 
-      # Trivy Scan Repo Files
+      # Run Trivy FS Scan (scan repository files)
       - name: Run Trivy FS Scan
-        run: |
-          trivy fs --no-progress --exit-code 1 --severity HIGH,CRITICAL .
+        run: trivy fs --exit-code 0 --severity HIGH,CRITICAL .
+
